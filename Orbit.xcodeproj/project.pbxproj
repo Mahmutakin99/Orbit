@@ -1,0 +1,363 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D100000100000000000000B2 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000B1 /* main.swift */; };
+		D100000100000000000000B4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000B3 /* AppDelegate.swift */; };
+		D100000100000000000000C2 /* Launcher/OverlayPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000C1 /* Launcher/OverlayPanel.swift */; };
+		D100000100000000000000C4 /* Launcher/RadialMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000C3 /* Launcher/RadialMenuView.swift */; };
+		D100000100000000000000C6 /* Trigger/HotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000C5 /* Trigger/HotkeyManager.swift */; };
+		D100000100000000000000D2 /* Apps/AppItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000D1 /* Apps/AppItem.swift */; };
+		D100000100000000000000D4 /* Apps/AppScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000D3 /* Apps/AppScanner.swift */; };
+		D100000100000000000000E2 /* Settings/Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000E1 /* Settings/Store.swift */; };
+		D100000100000000000000E4 /* Settings/SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000E3 /* Settings/SettingsView.swift */; };
+		D100000100000000000000F2 /* Trigger/ShakeDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000F1 /* Trigger/ShakeDetector.swift */; };
+		D100000100000000000000F4 /* Model/OrbitItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000F3 /* Model/OrbitItem.swift */; };
+		D100000100000000000000F6 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D100000100000000000000F5 /* IOKit.framework */; };
+		D100000100000000000000F8 /* Model/UsageTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000F7 /* Model/UsageTracker.swift */; };
+		D100000100000000000000FA /* Model/ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000F9 /* Model/ClipboardManager.swift */; };
+		D100000100000000000000FC /* Model/Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000FB /* Model/Localization.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		D100000100000000000000B1 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		D100000100000000000000B3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D100000100000000000000B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D100000100000000000000B6 /* Orbit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Orbit.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D100000100000000000000C1 /* Launcher/OverlayPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Launcher/OverlayPanel.swift; sourceTree = "<group>"; };
+		D100000100000000000000C3 /* Launcher/RadialMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Launcher/RadialMenuView.swift; sourceTree = "<group>"; };
+		D100000100000000000000C5 /* Trigger/HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trigger/HotkeyManager.swift; sourceTree = "<group>"; };
+		D100000100000000000000D1 /* Apps/AppItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Apps/AppItem.swift; sourceTree = "<group>"; };
+		D100000100000000000000D3 /* Apps/AppScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Apps/AppScanner.swift; sourceTree = "<group>"; };
+		D100000100000000000000E1 /* Settings/Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings/Store.swift; sourceTree = "<group>"; };
+		D100000100000000000000E3 /* Settings/SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings/SettingsView.swift; sourceTree = "<group>"; };
+		D100000100000000000000F1 /* Trigger/ShakeDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trigger/ShakeDetector.swift; sourceTree = "<group>"; };
+		D100000100000000000000F3 /* Model/OrbitItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model/OrbitItem.swift; sourceTree = "<group>"; };
+		D100000100000000000000F5 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		D100000100000000000000F7 /* Model/UsageTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model/UsageTracker.swift; sourceTree = "<group>"; };
+		D100000100000000000000F9 /* Model/ClipboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model/ClipboardManager.swift; sourceTree = "<group>"; };
+		D100000100000000000000FB /* Model/Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model/Localization.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D100000100000000000000B0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D100000100000000000000F6 /* IOKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D100000100000000000000AB /* Orbit */ = {
+			isa = PBXGroup;
+			children = (
+				D100000100000000000000B1 /* main.swift */,
+				D100000100000000000000B3 /* AppDelegate.swift */,
+				D100000100000000000000B5 /* Info.plist */,
+				D100000100000000000000C1 /* Launcher/OverlayPanel.swift */,
+				D100000100000000000000C3 /* Launcher/RadialMenuView.swift */,
+				D100000100000000000000C5 /* Trigger/HotkeyManager.swift */,
+				D100000100000000000000D1 /* Apps/AppItem.swift */,
+				D100000100000000000000D3 /* Apps/AppScanner.swift */,
+				D100000100000000000000E1 /* Settings/Store.swift */,
+				D100000100000000000000E3 /* Settings/SettingsView.swift */,
+				D100000100000000000000F1 /* Trigger/ShakeDetector.swift */,
+				D100000100000000000000F3 /* Model/OrbitItem.swift */,
+				D100000100000000000000F5 /* IOKit.framework */,
+				D100000100000000000000F7 /* Model/UsageTracker.swift */,
+				D100000100000000000000F9 /* Model/ClipboardManager.swift */,
+				D100000100000000000000FB /* Model/Localization.swift */,
+				D100000100000000000000AC /* Products */,
+			);
+			path = Orbit;
+			sourceTree = "<group>";
+		};
+		D100000100000000000000AC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D100000100000000000000B6 /* Orbit.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D100000100000000000000AD /* Orbit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D100000100000000000000BA /* Build configuration list for PBXNativeTarget "Orbit" */;
+			buildPhases = (
+				D100000100000000000000AE /* Sources */,
+				D100000100000000000000B0 /* Frameworks */,
+				D100000100000000000000AF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Orbit;
+			productName = Orbit;
+			productReference = D100000100000000000000B6 /* Orbit.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D100000100000000000000AA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 2650;
+				TargetAttributes = {
+					D100000100000000000000AD = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = D100000100000000000000B9 /* Build configuration list for PBXProject "Orbit" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D100000100000000000000AB /* Orbit */;
+			productRefGroup = D100000100000000000000AC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D100000100000000000000AD /* Orbit */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D100000100000000000000AF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D100000100000000000000AE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D100000100000000000000B2 /* main.swift in Sources */,
+				D100000100000000000000B4 /* AppDelegate.swift in Sources */,
+				D100000100000000000000C2 /* Launcher/OverlayPanel.swift in Sources */,
+				D100000100000000000000C4 /* Launcher/RadialMenuView.swift in Sources */,
+				D100000100000000000000C6 /* Trigger/HotkeyManager.swift in Sources */,
+				D100000100000000000000D2 /* Apps/AppItem.swift in Sources */,
+				D100000100000000000000D4 /* Apps/AppScanner.swift in Sources */,
+				D100000100000000000000E2 /* Settings/Store.swift in Sources */,
+				D100000100000000000000E4 /* Settings/SettingsView.swift in Sources */,
+				D100000100000000000000F2 /* Trigger/ShakeDetector.swift in Sources */,
+				D100000100000000000000F4 /* Model/OrbitItem.swift in Sources */,
+				D100000100000000000000F8 /* Model/UsageTracker.swift in Sources */,
+				D100000100000000000000FA /* Model/ClipboardManager.swift in Sources */,
+				D100000100000000000000FC /* Model/Localization.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D100000100000000000000B7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_CYCLES = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		D100000100000000000000B8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_CYCLES = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		D100000100000000000000BB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Orbit/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.orbit.launcher;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		D100000100000000000000BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Orbit/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.orbit.launcher;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D100000100000000000000B9 /* Build configuration list for PBXProject "Orbit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D100000100000000000000B7 /* Debug */,
+				D100000100000000000000B8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D100000100000000000000BA /* Build configuration list for PBXNativeTarget "Orbit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D100000100000000000000BB /* Debug */,
+				D100000100000000000000BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D100000100000000000000AA /* Project object */;
+}
