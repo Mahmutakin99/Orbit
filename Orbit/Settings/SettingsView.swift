@@ -149,6 +149,7 @@ private struct ItemsTab: View {
             if isRoot {
                 Divider()
                 Button(L("Add Folder…")) {
+                    editingItemID = nil
                     overlayTitle = "New Folder"
                     overlay = .submenuName
                 }
@@ -248,10 +249,15 @@ private struct ItemsTab: View {
     private func overlayView(for kind: OverlayKind) -> some View {
         switch kind {
         case .submenuName:
-            SubmenuNameOverlay(title: $overlayTitle) {
-                store.addItem(.makeSubmenu(title: overlayTitle))
+            SubmenuNameOverlay(title: $overlayTitle, isEditing: editingItemID != nil) {
+                if let id = editingItemID {
+                    store.renameSubmenu(id: id, title: overlayTitle)
+                    editingItemID = nil
+                } else {
+                    store.addItem(.makeSubmenu(title: overlayTitle))
+                }
                 overlay = nil
-            } onCancel: { overlay = nil }
+            } onCancel: { overlay = nil; editingItemID = nil }
 
         case .url:
             URLInputOverlay(itemTitle: $overlayTitle, urlString: $overlayValue, isEditing: editingItemID != nil) {
@@ -310,6 +316,12 @@ private struct ItemsTab: View {
                 editingItemID = item.id
                 overlayTitle = item.title; overlayValue = source; overlayRunInTerminal = runInTerminal
                 overlay = .script
+            }
+        case .submenu:
+            return {
+                editingItemID = item.id
+                overlayTitle = item.title
+                overlay = .submenuName
             }
         default:
             return nil
@@ -613,17 +625,18 @@ private struct ShortcutPickerSheet: View {
 
 private struct SubmenuNameOverlay: View {
     @Binding var title: String
+    var isEditing: Bool = false
     let onConfirm: () -> Void
     let onCancel: () -> Void
 
     var body: some View {
         overlayBase {
-            Text(L("New Folder")).font(.headline)
+            Text(isEditing ? L("Rename Folder") : L("New Folder")).font(.headline)
             TextField(L("Folder name"), text: $title)
                 .textFieldStyle(.roundedBorder).frame(width: 220)
             HStack(spacing: 12) {
                 Button("Cancel", action: onCancel)
-                Button("Create", action: onConfirm)
+                Button(isEditing ? L("Save") : L("Create"), action: onConfirm)
                     .keyboardShortcut(.defaultAction)
                     .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
             }
