@@ -42,6 +42,8 @@ private struct ItemsTab: View {
     // Overlay field state
     @State private var overlayTitle  = ""
     @State private var overlayValue  = ""   // URL string or script source
+    @State private var overlayRunInTerminal = false
+    @State private var editingItemID: UUID? = nil   // non-nil while editing an existing item
 
     private var currentItems: [OrbitItem] {
         if let s = editingSubmenu { return store.childrenOf(submenuID: s.id) }
@@ -118,6 +120,7 @@ private struct ItemsTab: View {
             // Link
             Button(L("Add Link…")) {
                 addingToSubmenuID = editingSubmenu?.id
+                editingItemID = nil
                 overlayTitle = ""; overlayValue = "https://"
                 overlay = .url
             }
@@ -138,7 +141,8 @@ private struct ItemsTab: View {
             // Script
             Button(L("Add Script…")) {
                 addingToSubmenuID = editingSubmenu?.id
-                overlayTitle = ""; overlayValue = "#!/bin/zsh\n"
+                editingItemID = nil
+                overlayTitle = ""; overlayValue = "#!/bin/zsh\n"; overlayRunInTerminal = false
                 overlay = .script
             }
 
@@ -168,6 +172,7 @@ private struct ItemsTab: View {
                 ItemRow(
                     item: item,
                     onDrillIn: item.isSubmenu ? { editingSubmenu = item } : nil,
+                    onEdit: editAction(for: item),
                     onRemove: {
                         if let sid = editingSubmenu?.id {
                             store.removeItem(id: item.id, fromSubmenuID: sid)
@@ -249,26 +254,65 @@ private struct ItemsTab: View {
             } onCancel: { overlay = nil }
 
         case .url:
-            URLInputOverlay(itemTitle: $overlayTitle, urlString: $overlayValue) {
+            URLInputOverlay(itemTitle: $overlayTitle, urlString: $overlayValue, isEditing: editingItemID != nil) {
                 var raw = overlayValue.trimmingCharacters(in: .whitespaces)
                 if !raw.contains("://") { raw = "https://" + raw }
                 let title = overlayTitle.isEmpty
                     ? (URL(string: raw)?.host ?? "Link")
                     : overlayTitle
-                let item = OrbitItem.makeURL(urlString: raw, title: title)
-                if let sid = addingToSubmenuID { store.addItem(item, toSubmenuID: sid) }
-                else { store.addItem(item) }
+                let kind = OrbitItemKind.url(urlString: raw)
+                commitItem(title: title, kind: kind, makeNew: { OrbitItem.makeURL(urlString: raw, title: title) })
                 overlay = nil
-            } onCancel: { overlay = nil }
+            } onCancel: { overlay = nil; editingItemID = nil }
 
         case .script:
-            ScriptInputOverlay(itemTitle: $overlayTitle, source: $overlayValue) {
+            ScriptInputOverlay(itemTitle: $overlayTitle, source: $overlayValue, runInTerminal: $overlayRunInTerminal, isEditing: editingItemID != nil) {
                 let title = overlayTitle.isEmpty ? "Script" : overlayTitle
-                let item = OrbitItem(title: title, kind: .script(source: overlayValue, isShell: true))
-                if let sid = addingToSubmenuID { store.addItem(item, toSubmenuID: sid) }
-                else { store.addItem(item) }
+                let kind = OrbitItemKind.script(source: overlayValue, isShell: true, runInTerminal: overlayRunInTerminal)
+                commitItem(title: title, kind: kind, makeNew: { OrbitItem(title: title, kind: kind) })
                 overlay = nil
-            } onCancel: { overlay = nil }
+            } onCancel: { overlay = nil; editingItemID = nil }
+        }
+    }
+
+    /// Either updates the item currently being edited (`editingItemID`), or
+    /// adds a freshly built one — mirroring the add/edit overlay duality.
+    private func commitItem(title: String, kind: OrbitItemKind, makeNew: () -> OrbitItem) {
+        if let id = editingItemID {
+            if let sid = addingToSubmenuID {
+                store.updateItem(id: id, inSubmenuID: sid, title: title, kind: kind)
+                editingSubmenu = store.rootItems.first { $0.id == sid }
+            } else {
+                store.updateItem(id: id, title: title, kind: kind)
+            }
+            editingItemID = nil
+        } else {
+            let item = makeNew()
+            if let sid = addingToSubmenuID { store.addItem(item, toSubmenuID: sid) }
+            else { store.addItem(item) }
+        }
+    }
+
+    /// Returns an edit closure for items whose overlay form supports editing
+    /// (link, script), or nil otherwise.
+    private func editAction(for item: OrbitItem) -> (() -> Void)? {
+        switch item.kind {
+        case .url(let s):
+            return {
+                addingToSubmenuID = editingSubmenu?.id
+                editingItemID = item.id
+                overlayTitle = item.title; overlayValue = s
+                overlay = .url
+            }
+        case .script(let source, _, let runInTerminal):
+            return {
+                addingToSubmenuID = editingSubmenu?.id
+                editingItemID = item.id
+                overlayTitle = item.title; overlayValue = source; overlayRunInTerminal = runInTerminal
+                overlay = .script
+            }
+        default:
+            return nil
         }
     }
 
@@ -315,6 +359,7 @@ private struct ItemsTab: View {
 private struct ItemRow: View {
     let item: OrbitItem
     var onDrillIn: (() -> Void)?
+    var onEdit: (() -> Void)?
     let onRemove: () -> Void
 
     private var subtitle: String? {
@@ -323,7 +368,7 @@ private struct ItemRow: View {
         case .app(let p): return URL(fileURLWithPath: p).deletingLastPathComponent().path == "/Applications" ? nil : URL(fileURLWithPath: p).deletingLastPathComponent().lastPathComponent
         case .systemAction(let a): return a.displayTitle == item.title ? nil : a.displayTitle
         case .submenu(let c): return "\(c.count) item\(c.count == 1 ? "" : "s")"
-        case .script: return "Shell script"
+        case .script(_, _, let runInTerminal): return runInTerminal ? "Shell script · Terminal" : "Shell script"
         case .shortcut: return "Shortcut"
         default: return nil
         }
@@ -350,6 +395,11 @@ private struct ItemRow: View {
             if let drill = onDrillIn {
                 Button(action: drill) {
                     Image(systemName: "chevron.forward").foregroundStyle(.secondary)
+                }.buttonStyle(.plain)
+            }
+            if let edit = onEdit {
+                Button(action: edit) {
+                    Image(systemName: "pencil.circle.fill").foregroundStyle(.secondary)
                 }.buttonStyle(.plain)
             }
             Button(action: onRemove) {
@@ -586,12 +636,13 @@ private struct SubmenuNameOverlay: View {
 private struct URLInputOverlay: View {
     @Binding var itemTitle: String
     @Binding var urlString: String
+    var isEditing: Bool = false
     let onConfirm: () -> Void
     let onCancel: () -> Void
 
     var body: some View {
         overlayBase {
-            Text(L("Add Link")).font(.headline)
+            Text(isEditing ? L("Edit Link") : L("Add Link")).font(.headline)
             VStack(alignment: .leading, spacing: 4) {
                 Text(L("Title (optional)")).font(.caption).foregroundStyle(.secondary)
                 TextField("e.g. GitHub", text: $itemTitle)
@@ -604,7 +655,7 @@ private struct URLInputOverlay: View {
             }
             HStack(spacing: 12) {
                 Button("Cancel", action: onCancel)
-                Button("Add", action: onConfirm)
+                Button(isEditing ? L("Save") : L("Add"), action: onConfirm)
                     .keyboardShortcut(.defaultAction)
                     .disabled(urlString.trimmingCharacters(in: .whitespaces).isEmpty)
             }
@@ -617,12 +668,14 @@ private struct URLInputOverlay: View {
 private struct ScriptInputOverlay: View {
     @Binding var itemTitle: String
     @Binding var source: String
+    @Binding var runInTerminal: Bool
+    var isEditing: Bool = false
     let onConfirm: () -> Void
     let onCancel: () -> Void
 
     var body: some View {
         overlayBase {
-            Text(L("Add Shell Script")).font(.headline)
+            Text(isEditing ? L("Edit Shell Script") : L("Add Shell Script")).font(.headline)
             VStack(alignment: .leading, spacing: 4) {
                 Text(L("Title")).font(.caption).foregroundStyle(.secondary)
                 TextField(L("Script name"), text: $itemTitle)
@@ -635,9 +688,11 @@ private struct ScriptInputOverlay: View {
                     .frame(width: 300, height: 100)
                     .border(Color(nsColor: .separatorColor))
             }
+            Toggle(L("Run in Terminal"), isOn: $runInTerminal)
+                .frame(width: 300, alignment: .leading)
             HStack(spacing: 12) {
                 Button("Cancel", action: onCancel)
-                Button("Add", action: onConfirm)
+                Button(isEditing ? L("Save") : L("Add"), action: onConfirm)
                     .keyboardShortcut(.defaultAction)
                     .disabled(itemTitle.trimmingCharacters(in: .whitespaces).isEmpty)
             }
@@ -720,6 +775,7 @@ private struct ContextTab: View {
     @State private var overlay: OverlayKind? = nil
     @State private var overlayTitle = ""
     @State private var overlayValue = ""
+    @State private var overlayRunInTerminal = false
 
     private var allApps: [AppItem] { AppScanner.scanAll() }
 
@@ -819,7 +875,8 @@ private struct ContextTab: View {
             }
             Button(L("Add Shortcut…")) { showingShortcuts = true }
             Button(L("Add Script…")) {
-                overlayTitle = ""; overlayValue = "#!/bin/zsh\n"; overlay = .script
+                overlayTitle = ""; overlayValue = "#!/bin/zsh\n"; overlayRunInTerminal = false
+                overlay = .script
             }
         } label: {
             Image(systemName: "plus.circle.fill").font(.title3).foregroundStyle(Color.accentColor)
@@ -910,11 +967,11 @@ private struct ContextTab: View {
                 overlay = nil
             } onCancel: { overlay = nil }
         case .script:
-            ScriptInputOverlay(itemTitle: $overlayTitle, source: $overlayValue) {
+            ScriptInputOverlay(itemTitle: $overlayTitle, source: $overlayValue, runInTerminal: $overlayRunInTerminal) {
                 guard let path = selectedAppPath else { overlay = nil; return }
                 let title = overlayTitle.isEmpty ? "Script" : overlayTitle
                 store.addContextItem(
-                    OrbitItem(title: title, kind: .script(source: overlayValue, isShell: true)),
+                    OrbitItem(title: title, kind: .script(source: overlayValue, isShell: true, runInTerminal: overlayRunInTerminal)),
                     forApp: path
                 )
                 overlay = nil

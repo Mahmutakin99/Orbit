@@ -36,14 +36,17 @@ final class UsageTracker {
 
     // MARK: - Intensity query (0…1, nil = no usage)
 
-    /// Returns the item's intensity relative to maxScore among `peers`.
+    /// Returns the item's intensity relative to peers, floored against an
+    /// absolute "busy day" reference so a couple of early uses don't
+    /// immediately read as maximum (red) just for lacking competition.
     func intensity(for item: OrbitItem, among peers: [OrbitItem]) -> Double? {
         checkDayRollover()
-        let max = peers.map { score(for: $0) }.max() ?? 0
-        guard max > 0 else { return nil }
         let s = score(for: item)
         guard s > 0 else { return nil }
-        return min(1.0, s / max)
+        let peerMax = peers.map { score(for: $0) }.max() ?? 0
+        let reference = 3600.0   // ~12 opens or 1hr foreground = a genuinely busy item
+        let denom = Swift.max(peerMax, reference)
+        return min(1.0, s / denom)
     }
 
     // MARK: - Private: score

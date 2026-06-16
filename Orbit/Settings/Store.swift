@@ -153,6 +153,13 @@ final class Store: ObservableObject {
         rootItems.removeAll { $0.id == id }
     }
 
+    func updateItem(id: UUID, title: String, kind: OrbitItemKind) {
+        if let i = rootItems.firstIndex(where: { $0.id == id }) {
+            rootItems[i].title = title
+            rootItems[i].kind = kind
+        }
+    }
+
     func move(from source: IndexSet, to destination: Int) {
         rootItems.move(fromOffsets: source, toOffset: destination)
     }
@@ -168,6 +175,15 @@ final class Store: ObservableObject {
 
     func removeItem(id: UUID, fromSubmenuID submenuID: UUID) {
         mutateSubmenu(id: submenuID) { $0.removeAll { $0.id == id } }
+    }
+
+    func updateItem(id: UUID, inSubmenuID submenuID: UUID, title: String, kind: OrbitItemKind) {
+        mutateSubmenu(id: submenuID) { children in
+            if let i = children.firstIndex(where: { $0.id == id }) {
+                children[i].title = title
+                children[i].kind = kind
+            }
+        }
     }
 
     func moveInSubmenu(id submenuID: UUID, from source: IndexSet, to destination: Int) {

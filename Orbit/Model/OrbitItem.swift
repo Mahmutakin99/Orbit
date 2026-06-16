@@ -35,7 +35,7 @@ enum SystemAction: String, Codable, CaseIterable {
             proc.arguments = ["-suspend"]; try? proc.run()
         case .screensaver:
             let proc = Process(); proc.launchPath = "/usr/bin/open"
-            proc.arguments = ["-a", "ScreenSaverEngine"]; try? proc.run()
+            proc.arguments = ["/System/Library/CoreServices/ScreenSaverEngine.app"]; try? proc.run()
         case .emptyTrash:
             let trash = FileManager.default.urls(for: .trashDirectory, in: .userDomainMask)
             let items = (try? FileManager.default.contentsOfDirectory(
@@ -50,15 +50,99 @@ enum SystemAction: String, Codable, CaseIterable {
 
 // MARK: - Kind
 
-enum OrbitItemKind: Codable {
+enum OrbitItemKind {
     case app(path: String)
     case file(path: String)
     case url(urlString: String)
     case systemAction(SystemAction)
     case shortcut(name: String)
-    case script(source: String, isShell: Bool)
+    case script(source: String, isShell: Bool, runInTerminal: Bool)
     indirect case submenu(children: [OrbitItem])
     case clipboard(text: String)
+}
+
+// MARK: - Manual Codable
+//
+// Hand-written to preserve the exact wire format Swift's synthesized
+// Codable produced before `runInTerminal` was added, so previously saved
+// items (UserDefaults JSON) keep decoding correctly. Missing `isShell`/
+// `runInTerminal` keys fall back to their pre-existing defaults.
+extension OrbitItemKind: Codable {
+    private enum CodingKeys: String, CodingKey {
+        case app, file, url, systemAction, shortcut, script, submenu, clipboard
+    }
+    private enum AppKeys: String, CodingKey { case path }
+    private enum FileKeys: String, CodingKey { case path }
+    private enum URLKeys: String, CodingKey { case urlString }
+    private enum SystemActionKeys: String, CodingKey { case _0 }
+    private enum ShortcutKeys: String, CodingKey { case name }
+    private enum ScriptKeys: String, CodingKey { case source, isShell, runInTerminal }
+    private enum SubmenuKeys: String, CodingKey { case children }
+    private enum ClipboardKeys: String, CodingKey { case text }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if let c = try? container.nestedContainer(keyedBy: AppKeys.self, forKey: .app) {
+            self = .app(path: try c.decode(String.self, forKey: .path)); return
+        }
+        if let c = try? container.nestedContainer(keyedBy: FileKeys.self, forKey: .file) {
+            self = .file(path: try c.decode(String.self, forKey: .path)); return
+        }
+        if let c = try? container.nestedContainer(keyedBy: URLKeys.self, forKey: .url) {
+            self = .url(urlString: try c.decode(String.self, forKey: .urlString)); return
+        }
+        if let c = try? container.nestedContainer(keyedBy: SystemActionKeys.self, forKey: .systemAction) {
+            self = .systemAction(try c.decode(SystemAction.self, forKey: ._0)); return
+        }
+        if let c = try? container.nestedContainer(keyedBy: ShortcutKeys.self, forKey: .shortcut) {
+            self = .shortcut(name: try c.decode(String.self, forKey: .name)); return
+        }
+        if let c = try? container.nestedContainer(keyedBy: ScriptKeys.self, forKey: .script) {
+            let source = try c.decode(String.self, forKey: .source)
+            let isShell = try c.decodeIfPresent(Bool.self, forKey: .isShell) ?? true
+            let runInTerminal = try c.decodeIfPresent(Bool.self, forKey: .runInTerminal) ?? false
+            self = .script(source: source, isShell: isShell, runInTerminal: runInTerminal); return
+        }
+        if let c = try? container.nestedContainer(keyedBy: SubmenuKeys.self, forKey: .submenu) {
+            self = .submenu(children: try c.decode([OrbitItem].self, forKey: .children)); return
+        }
+        if let c = try? container.nestedContainer(keyedBy: ClipboardKeys.self, forKey: .clipboard) {
+            self = .clipboard(text: try c.decode(String.self, forKey: .text)); return
+        }
+        throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown OrbitItemKind"))
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .app(let path):
+            var c = container.nestedContainer(keyedBy: AppKeys.self, forKey: .app)
+            try c.encode(path, forKey: .path)
+        case .file(let path):
+            var c = container.nestedContainer(keyedBy: FileKeys.self, forKey: .file)
+            try c.encode(path, forKey: .path)
+        case .url(let s):
+            var c = container.nestedContainer(keyedBy: URLKeys.self, forKey: .url)
+            try c.encode(s, forKey: .urlString)
+        case .systemAction(let a):
+            var c = container.nestedContainer(keyedBy: SystemActionKeys.self, forKey: .systemAction)
+            try c.encode(a, forKey: ._0)
+        case .shortcut(let name):
+            var c = container.nestedContainer(keyedBy: ShortcutKeys.self, forKey: .shortcut)
+            try c.encode(name, forKey: .name)
+        case .script(let source, let isShell, let runInTerminal):
+            var c = container.nestedContainer(keyedBy: ScriptKeys.self, forKey: .script)
+            try c.encode(source, forKey: .source)
+            try c.encode(isShell, forKey: .isShell)
+            try c.encode(runInTerminal, forKey: .runInTerminal)
+        case .submenu(let children):
+            var c = container.nestedContainer(keyedBy: SubmenuKeys.self, forKey: .submenu)
+            try c.encode(children, forKey: .children)
+        case .clipboard(let text):
+            var c = container.nestedContainer(keyedBy: ClipboardKeys.self, forKey: .clipboard)
+            try c.encode(text, forKey: .text)
+        }
+    }
 }
 
 // MARK: - Item
@@ -147,8 +231,15 @@ struct OrbitItem: Identifiable, Codable {
         case .shortcut(let name):
             let p = Process(); p.launchPath = "/usr/bin/shortcuts"
             p.arguments = ["run", name]; try? p.run()
-        case .script(let src, let isShell):
-            if isShell {
+        case .script(let src, let isShell, let runInTerminal):
+            guard isShell else { break }
+            if runInTerminal {
+                let tmp = NSTemporaryDirectory() + "orbit-\(UUID().uuidString).sh"
+                try? src.write(toFile: tmp, atomically: true, encoding: .utf8)
+                let osa = "tell application \"Terminal\"\nactivate\ndo script \"bash '\(tmp)'\"\nend tell"
+                let p = Process(); p.launchPath = "/usr/bin/osascript"
+                p.arguments = ["-e", osa]; try? p.run()
+            } else {
                 let p = Process(); p.launchPath = "/bin/zsh"
                 p.arguments = ["-c", src]; try? p.run()
             }
