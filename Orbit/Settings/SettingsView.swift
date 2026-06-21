@@ -11,6 +11,8 @@ struct SettingsView: View {
                 .tabItem { Label(L("Items"), systemImage: "circle.grid.3x3") }
             ContextTab()
                 .tabItem { Label(L("Context"), systemImage: "app.badge") }
+            MonitorTab()
+                .tabItem { Label(L("Monitor"), systemImage: "gauge.with.dots.needle.bottom.50percent") }
             GeneralTab()
                 .tabItem { Label(L("General"), systemImage: "gearshape") }
         }
@@ -730,6 +732,18 @@ private func overlayBase<Content: View>(@ViewBuilder content: () -> Content) -> 
 private struct GeneralTab: View {
     @ObservedObject private var store = Store.shared
 
+    @ViewBuilder
+    private func shortcutRow(label: String, badge: String) -> some View {
+        HStack {
+            Text(label); Spacer()
+            Text(badge)
+                .font(.system(.body, design: .monospaced))
+                .padding(.horizontal, 8).padding(.vertical, 2)
+                .background(Color(nsColor: .controlBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
+    }
+
     var body: some View {
         Form {
             Section(L("Language")) {
@@ -746,8 +760,17 @@ private struct GeneralTab: View {
                     set: { store.launchAtLogin = $0 }
                 ))
             }
+            Section(L("Menu Bar Icon")) {
+                Picker(L("Menu Bar Icon"), selection: $store.launcherFlag) {
+                    Text("◌  \(L("Default"))").tag("")
+                    ForEach(MenuBarFlags.all, id: \.flag) { item in
+                        Text("\(item.flag)  \(item.name)").tag(item.flag)
+                    }
+                }
+                .labelsHidden()
+            }
             Section(L("Trigger")) {
-                Toggle(L("Mouse shake (hold ⌥ + shake)"), isOn: $store.shakeEnabled)
+                Toggle(L("Mouse shake (hold ⌥/⌃ + shake)"), isOn: $store.shakeEnabled)
                 if store.shakeEnabled {
                     HStack {
                         Text(L("Sensitivity"))
@@ -763,18 +786,117 @@ private struct GeneralTab: View {
                 }
             }
             Section(L("Keyboard Shortcut")) {
-                HStack {
-                    Text(L("Toggle radial menu")); Spacer()
-                    Text("⌘⇧D")
-                        .font(.system(.body, design: .monospaced))
-                        .padding(.horizontal, 8).padding(.vertical, 2)
-                        .background(Color(nsColor: .controlBackgroundColor))
-                        .clipShape(RoundedRectangle(cornerRadius: 4))
-                }
+                shortcutRow(label: L("Toggle radial menu"), badge: "⌘⇧D")
+                shortcutRow(label: L("Open windows"), badge: "⌘⇧W")
+            }
+            Section(L("Windows")) {
+                Toggle(L("Window previews (needs Screen Recording)"), isOn: $store.windowPreviews)
+                    .onChange(of: store.windowPreviews) { newValue in
+                        if newValue { CGRequestScreenCaptureAccess() }
+                    }
             }
         }
         .formStyle(.grouped)
     }
+}
+
+// MARK: - Monitor Tab
+
+private struct MonitorTab: View {
+    @ObservedObject private var store = Store.shared
+    @State private var draggedMetric: MonitorMetric?
+
+    var body: some View {
+        Form {
+            Section {
+                Toggle(L("Show system monitor"), isOn: $store.monitorEnabled)
+            }
+
+            Section {
+                ForEach(store.metricOrder) { metric in
+                    HStack(spacing: 8) {
+                        Image(systemName: "line.3.horizontal")
+                            .foregroundStyle(.tertiary)
+                        Image(systemName: metric.symbol)
+                            .frame(width: 18)
+                            .foregroundStyle(.secondary)
+                        Toggle(L(metric.labelKey), isOn: binding(for: metric))
+                    }
+                    .contentShape(Rectangle())
+                    .opacity(draggedMetric == metric ? 0.4 : 1)
+                    .onDrag {
+                        draggedMetric = metric
+                        return NSItemProvider(object: metric.rawValue as NSString)
+                    }
+                    .onDrop(of: [UTType.text], delegate: MetricDropDelegate(
+                        item: metric, dragged: $draggedMetric, store: store))
+                }
+            } header: {
+                Text(L("Metrics"))
+            } footer: {
+                Text(L("Drag to reorder. Temperature and fan appear only on supported Macs."))
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+
+            Section(L("Units")) {
+                Picker(L("Temperature unit"), selection: $store.temperatureUnit) {
+                    Text("°C").tag(TemperatureUnit.celsius)
+                    Text("°F").tag(TemperatureUnit.fahrenheit)
+                }
+                Picker(L("Network unit"), selection: $store.networkUnit) {
+                    Text(L("Bytes (KB/s)")).tag(NetworkUnit.bytes)
+                    Text(L("Bits (Kbps)")).tag(NetworkUnit.bits)
+                }
+            }
+
+            Section(L("Display")) {
+                Picker(L("Label style"), selection: $store.monitorLabelStyle) {
+                    Text(L("Symbol")).tag(MonitorLabelStyle.symbol)
+                    Text(L("Name")).tag(MonitorLabelStyle.name)
+                }
+                Picker(L("Update interval"), selection: $store.monitorInterval) {
+                    Text("1s").tag(1.0)
+                    Text("2s").tag(2.0)
+                    Text("3s").tag(3.0)
+                    Text("5s").tag(5.0)
+                }
+                Toggle(L("Color high values"), isOn: $store.monitorColorCoding)
+            }
+        }
+        .formStyle(.grouped)
+    }
+
+    private func binding(for metric: MonitorMetric) -> Binding<Bool> {
+        Binding(
+            get: { !store.disabledMetrics.contains(metric) },
+            set: { on in
+                if on { store.disabledMetrics.remove(metric) }
+                else  { store.disabledMetrics.insert(metric) }
+            }
+        )
+    }
+}
+
+/// Live drag-to-reorder for the metrics list: as the dragged row hovers over
+/// another, the two swap positions in `store.metricOrder`.
+private struct MetricDropDelegate: DropDelegate {
+    let item: MonitorMetric
+    @Binding var dragged: MonitorMetric?
+    let store: Store
+
+    func dropEntered(info: DropInfo) {
+        guard let dragged, dragged != item,
+              let from = store.metricOrder.firstIndex(of: dragged),
+              let to = store.metricOrder.firstIndex(of: item) else { return }
+        withAnimation {
+            store.metricOrder.move(fromOffsets: IndexSet(integer: from),
+                                   toOffset: to > from ? to + 1 : to)
+        }
+    }
+
+    func dropUpdated(info: DropInfo) -> DropProposal? { DropProposal(operation: .move) }
+
+    func performDrop(info: DropInfo) -> Bool { dragged = nil; return true }
 }
 
 // MARK: - Context Tab

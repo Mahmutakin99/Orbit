@@ -12,7 +12,11 @@
 		D100000100000000000000C2 /* Launcher/OverlayPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000C1 /* Launcher/OverlayPanel.swift */; };
 		D100000100000000000000C4 /* Launcher/RadialMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000C3 /* Launcher/RadialMenuView.swift */; };
 		D100000100000000000000C6 /* Trigger/HotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000C5 /* Trigger/HotkeyManager.swift */; };
-		D100000100000000000000D2 /* Apps/AppItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000D1 /* Apps/AppItem.swift */; };
+		D100000100000000000000C8 /* Monitor/SystemMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000C7 /* Monitor/SystemMonitor.swift */; };
+		D100000100000000000000CA /* Monitor/MonitorStatusController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000C9 /* Monitor/MonitorStatusController.swift */; };
+		D100000100000000000000CC /* Monitor/MonitorPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000CB /* Monitor/MonitorPopoverView.swift */; };
+		D100000100000000000000CE /* Monitor/MonitorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000CD /* Monitor/MonitorViewModel.swift */; };
+		D100000100000000000000D2 /* AppItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000D1 /* AppItem.swift */; };
 		D100000100000000000000D4 /* Apps/AppScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000D3 /* Apps/AppScanner.swift */; };
 		D100000100000000000000E2 /* Settings/Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000E1 /* Settings/Store.swift */; };
 		D100000100000000000000E4 /* Settings/SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000E3 /* Settings/SettingsView.swift */; };
@@ -22,6 +26,13 @@
 		D100000100000000000000F8 /* Model/UsageTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000F7 /* Model/UsageTracker.swift */; };
 		D100000100000000000000FA /* Model/ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000F9 /* Model/ClipboardManager.swift */; };
 		D100000100000000000000FC /* Model/Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000FB /* Model/Localization.swift */; };
+		D100000100000000000000FE /* Monitor/SMC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000FD /* Monitor/SMC.swift */; };
+		D10000010000000000000100 /* Monitor/GPUReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D100000100000000000000FF /* Monitor/GPUReader.swift */; };
+		D10000010000000000000102 /* Monitor/PingReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000010000000000000101 /* Monitor/PingReader.swift */; };
+		D10000010000000000000106 /* Monitor/BatteryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000010000000000000105 /* Monitor/BatteryReader.swift */; };
+		D10000010000000000000108 /* Monitor/SystemControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000010000000000000107 /* Monitor/SystemControls.swift */; };
+		D1000001000000000000010A /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D10000010000000000000109 /* CoreAudio.framework */; };
+		D10000010000000000000104 /* Network.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D10000010000000000000103 /* Network.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,7 +43,11 @@
 		D100000100000000000000C1 /* Launcher/OverlayPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Launcher/OverlayPanel.swift; sourceTree = "<group>"; };
 		D100000100000000000000C3 /* Launcher/RadialMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Launcher/RadialMenuView.swift; sourceTree = "<group>"; };
 		D100000100000000000000C5 /* Trigger/HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trigger/HotkeyManager.swift; sourceTree = "<group>"; };
-		D100000100000000000000D1 /* Apps/AppItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Apps/AppItem.swift; sourceTree = "<group>"; };
+		D100000100000000000000C7 /* Monitor/SystemMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Monitor/SystemMonitor.swift; sourceTree = "<group>"; };
+		D100000100000000000000C9 /* Monitor/MonitorStatusController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Monitor/MonitorStatusController.swift; sourceTree = "<group>"; };
+		D100000100000000000000CB /* Monitor/MonitorPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Monitor/MonitorPopoverView.swift; sourceTree = "<group>"; };
+		D100000100000000000000CD /* Monitor/MonitorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Monitor/MonitorViewModel.swift; sourceTree = "<group>"; };
+		D100000100000000000000D1 /* AppItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppItem.swift; path = Apps/AppItem.swift; sourceTree = "<group>"; };
 		D100000100000000000000D3 /* Apps/AppScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Apps/AppScanner.swift; sourceTree = "<group>"; };
 		D100000100000000000000E1 /* Settings/Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings/Store.swift; sourceTree = "<group>"; };
 		D100000100000000000000E3 /* Settings/SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings/SettingsView.swift; sourceTree = "<group>"; };
@@ -42,6 +57,13 @@
 		D100000100000000000000F7 /* Model/UsageTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model/UsageTracker.swift; sourceTree = "<group>"; };
 		D100000100000000000000F9 /* Model/ClipboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model/ClipboardManager.swift; sourceTree = "<group>"; };
 		D100000100000000000000FB /* Model/Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model/Localization.swift; sourceTree = "<group>"; };
+		D100000100000000000000FD /* Monitor/SMC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Monitor/SMC.swift; sourceTree = "<group>"; };
+		D100000100000000000000FF /* Monitor/GPUReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Monitor/GPUReader.swift; sourceTree = "<group>"; };
+		D10000010000000000000101 /* Monitor/PingReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Monitor/PingReader.swift; sourceTree = "<group>"; };
+		D10000010000000000000105 /* Monitor/BatteryReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Monitor/BatteryReader.swift; sourceTree = "<group>"; };
+		D10000010000000000000107 /* Monitor/SystemControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Monitor/SystemControls.swift; sourceTree = "<group>"; };
+		D10000010000000000000109 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		D10000010000000000000103 /* Network.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Network.framework; path = System/Library/Frameworks/Network.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +72,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				D100000100000000000000F6 /* IOKit.framework in Frameworks */,
+				D10000010000000000000104 /* Network.framework in Frameworks */,
+				D1000001000000000000010A /* CoreAudio.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,7 +89,7 @@
 				D100000100000000000000C1 /* Launcher/OverlayPanel.swift */,
 				D100000100000000000000C3 /* Launcher/RadialMenuView.swift */,
 				D100000100000000000000C5 /* Trigger/HotkeyManager.swift */,
-				D100000100000000000000D1 /* Apps/AppItem.swift */,
+				D100000100000000000000D1 /* AppItem.swift */,
 				D100000100000000000000D3 /* Apps/AppScanner.swift */,
 				D100000100000000000000E1 /* Settings/Store.swift */,
 				D100000100000000000000E3 /* Settings/SettingsView.swift */,
@@ -75,6 +99,17 @@
 				D100000100000000000000F7 /* Model/UsageTracker.swift */,
 				D100000100000000000000F9 /* Model/ClipboardManager.swift */,
 				D100000100000000000000FB /* Model/Localization.swift */,
+				D100000100000000000000FD /* Monitor/SMC.swift */,
+				D100000100000000000000FF /* Monitor/GPUReader.swift */,
+				D10000010000000000000101 /* Monitor/PingReader.swift */,
+				D10000010000000000000105 /* Monitor/BatteryReader.swift */,
+				D10000010000000000000107 /* Monitor/SystemControls.swift */,
+				D10000010000000000000109 /* CoreAudio.framework */,
+				D10000010000000000000103 /* Network.framework */,
+				D100000100000000000000C7 /* Monitor/SystemMonitor.swift */,
+				D100000100000000000000C9 /* Monitor/MonitorStatusController.swift */,
+				D100000100000000000000CB /* Monitor/MonitorPopoverView.swift */,
+				D100000100000000000000CD /* Monitor/MonitorViewModel.swift */,
 				D100000100000000000000AC /* Products */,
 			);
 			path = Orbit;
@@ -161,7 +196,7 @@
 				D100000100000000000000C2 /* Launcher/OverlayPanel.swift in Sources */,
 				D100000100000000000000C4 /* Launcher/RadialMenuView.swift in Sources */,
 				D100000100000000000000C6 /* Trigger/HotkeyManager.swift in Sources */,
-				D100000100000000000000D2 /* Apps/AppItem.swift in Sources */,
+				D100000100000000000000D2 /* AppItem.swift in Sources */,
 				D100000100000000000000D4 /* Apps/AppScanner.swift in Sources */,
 				D100000100000000000000E2 /* Settings/Store.swift in Sources */,
 				D100000100000000000000E4 /* Settings/SettingsView.swift in Sources */,
@@ -170,6 +205,15 @@
 				D100000100000000000000F8 /* Model/UsageTracker.swift in Sources */,
 				D100000100000000000000FA /* Model/ClipboardManager.swift in Sources */,
 				D100000100000000000000FC /* Model/Localization.swift in Sources */,
+				D100000100000000000000FE /* Monitor/SMC.swift in Sources */,
+				D10000010000000000000100 /* Monitor/GPUReader.swift in Sources */,
+				D10000010000000000000102 /* Monitor/PingReader.swift in Sources */,
+				D10000010000000000000106 /* Monitor/BatteryReader.swift in Sources */,
+				D10000010000000000000108 /* Monitor/SystemControls.swift in Sources */,
+				D100000100000000000000C8 /* Monitor/SystemMonitor.swift in Sources */,
+				D100000100000000000000CA /* Monitor/MonitorStatusController.swift in Sources */,
+				D100000100000000000000CC /* Monitor/MonitorPopoverView.swift in Sources */,
+				D100000100000000000000CE /* Monitor/MonitorViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

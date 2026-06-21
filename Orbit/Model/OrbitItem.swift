@@ -59,6 +59,7 @@ enum OrbitItemKind {
     case script(source: String, isShell: Bool, runInTerminal: Bool)
     indirect case submenu(children: [OrbitItem])
     case clipboard(text: String)
+    case window(pid: pid_t, title: String, windowID: CGWindowID = 0)
 }
 
 // MARK: - Manual Codable
@@ -69,8 +70,9 @@ enum OrbitItemKind {
 // `runInTerminal` keys fall back to their pre-existing defaults.
 extension OrbitItemKind: Codable {
     private enum CodingKeys: String, CodingKey {
-        case app, file, url, systemAction, shortcut, script, submenu, clipboard
+        case app, file, url, systemAction, shortcut, script, submenu, clipboard, window
     }
+    private enum WindowKeys: String, CodingKey { case pid, title, windowID }
     private enum AppKeys: String, CodingKey { case path }
     private enum FileKeys: String, CodingKey { case path }
     private enum URLKeys: String, CodingKey { case urlString }
@@ -109,6 +111,13 @@ extension OrbitItemKind: Codable {
         if let c = try? container.nestedContainer(keyedBy: ClipboardKeys.self, forKey: .clipboard) {
             self = .clipboard(text: try c.decode(String.self, forKey: .text)); return
         }
+        if let c = try? container.nestedContainer(keyedBy: WindowKeys.self, forKey: .window) {
+            self = .window(
+                pid:      try c.decode(pid_t.self, forKey: .pid),
+                title:    try c.decode(String.self, forKey: .title),
+                windowID: (try? c.decodeIfPresent(CGWindowID.self, forKey: .windowID)) ?? 0
+            ); return
+        }
         throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown OrbitItemKind"))
     }
 
@@ -141,6 +150,11 @@ extension OrbitItemKind: Codable {
         case .clipboard(let text):
             var c = container.nestedContainer(keyedBy: ClipboardKeys.self, forKey: .clipboard)
             try c.encode(text, forKey: .text)
+        case .window(let pid, let title, let windowID):
+            var c = container.nestedContainer(keyedBy: WindowKeys.self, forKey: .window)
+            try c.encode(pid, forKey: .pid)
+            try c.encode(title, forKey: .title)
+            try c.encode(windowID, forKey: .windowID)
         }
     }
 }
@@ -151,6 +165,10 @@ struct OrbitItem: Identifiable, Codable {
     var id: UUID
     var title: String
     var kind: OrbitItemKind
+    /// Ephemeral window thumbnail; never persisted.
+    var previewImage: NSImage? = nil
+
+    private enum CodingKeys: String, CodingKey { case id, title, kind }
 
     init(id: UUID = UUID(), title: String, kind: OrbitItemKind) {
         self.id = id; self.title = title; self.kind = kind
@@ -177,6 +195,7 @@ struct OrbitItem: Identifiable, Codable {
     // MARK: - Runtime properties (not Codable)
 
     var icon: NSImage {
+        if let p = previewImage { return p }
         switch kind {
         case .app(let p), .file(let p):
             return NSWorkspace.shared.icon(forFile: p)
@@ -192,6 +211,10 @@ struct OrbitItem: Identifiable, Codable {
             return sym("folder.fill") ?? NSImage(named: NSImage.folderName)!
         case .clipboard:
             return sym("doc.on.clipboard") ?? NSImage(named: NSImage.actionTemplateName)!
+        case .window(let pid, _, _):
+            if let app = NSWorkspace.shared.runningApplications.first(where: { $0.processIdentifier == pid }),
+               let icon = app.icon { return icon }
+            return sym("macwindow") ?? NSImage(named: NSImage.actionTemplateName)!
         }
     }
 
@@ -205,6 +228,7 @@ struct OrbitItem: Identifiable, Codable {
         case .script:       return L("Script")
         case .submenu:      return L("Folder")
         case .clipboard:    return L("Clipboard")
+        case .window:       return L("Window")
         }
     }
 
@@ -248,6 +272,33 @@ struct OrbitItem: Identifiable, Codable {
         case .clipboard(let text):
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(text, forType: .string)
+        case .window(let pid, let title, let windowID):
+            guard let app = NSWorkspace.shared.runningApplications.first(where: { $0.processIdentifier == pid }) else { return }
+            let axApp = AXUIElementCreateApplication(pid)
+            var value: CFTypeRef?
+            if AXUIElementCopyAttributeValue(axApp, kAXWindowsAttribute as CFString, &value) == .success,
+               let wins = value as? [AXUIElement] {
+                for win in wins {
+                    var matched = false
+                    // Primary: match by CGWindowID — unambiguous, works even when title changes
+                    if windowID != 0, axCGWindowID(win) == windowID { matched = true }
+                    // Fallback: match by title
+                    if !matched {
+                        var titleRef: CFTypeRef?
+                        AXUIElementCopyAttributeValue(win, kAXTitleAttribute as CFString, &titleRef)
+                        if (titleRef as? String) == title { matched = true }
+                    }
+                    if matched {
+                        // Tell the app which window to focus BEFORE activating so macOS
+                        // switches Spaces correctly for full-screen windows.
+                        AXUIElementSetAttributeValue(axApp, kAXFocusedWindowAttribute as CFString, win)
+                        AXUIElementSetAttributeValue(win, kAXMainAttribute as CFString, kCFBooleanTrue)
+                        AXUIElementPerformAction(win, kAXRaiseAction as CFString)
+                        break
+                    }
+                }
+            }
+            app.activate(options: [.activateIgnoringOtherApps])
         }
     }
 }
@@ -256,4 +307,20 @@ struct OrbitItem: Identifiable, Codable {
 
 private func sym(_ name: String) -> NSImage? {
     NSImage(systemSymbolName: name, accessibilityDescription: nil)
+}
+
+// MARK: - AX → CGWindowID bridge
+//
+// Private CoreGraphics/AX API used by window managers (yabai, Rectangle) to map
+// an AXUIElement to its CGWindowID. The public "AXWindowID" string attribute is
+// unreliable — some apps (notably Google Chrome) don't respond to it — so this
+// is the only robust way to match an AX window against a ScreenCaptureKit one.
+@_silgen_name("_AXUIElementGetWindow")
+func _AXUIElementGetWindow(_ element: AXUIElement, _ windowID: UnsafeMutablePointer<CGWindowID>) -> AXError
+
+/// CGWindowID for an AX window element, or 0 if unavailable.
+func axCGWindowID(_ element: AXUIElement) -> CGWindowID {
+    var id = CGWindowID(0)
+    _ = _AXUIElementGetWindow(element, &id)
+    return id
 }

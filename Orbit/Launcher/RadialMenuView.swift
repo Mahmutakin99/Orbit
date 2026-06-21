@@ -63,9 +63,14 @@ struct RadialMenuView: View {
     var onBack:          (() -> Void)? = nil
     let onDismiss:       () -> Void
 
-    private let radius:  CGFloat = 130
+    private var radius:  CGFloat { isWindowMode ? 148 : 130 }
     private let iconSize: CGFloat = 52
     private let perPage = OrbitItem.itemsPerPage
+
+    /// Windows panel uses a roomier circle for the larger rectangular previews.
+    private var isWindowMode: Bool {
+        if case .window = items.first?.kind { return true }; return false
+    }
 
     @State private var appeared  = false
     @State private var hoveredID: UUID?
@@ -113,7 +118,7 @@ struct RadialMenuView: View {
             Circle()
                 .fill(.ultraThinMaterial.opacity(0.75))
                 .overlay(Circle().strokeBorder(Color.white.opacity(0.1), lineWidth: 1))
-                .frame(width: 310, height: 310)
+                .frame(width: isWindowMode ? 350 : 310, height: isWindowMode ? 350 : 310)
                 .shadow(color: .black.opacity(0.4), radius: 40, y: 12)
 
             ForEach(Array(pageItems.enumerated()), id: \.element.id) { index, item in
@@ -306,17 +311,28 @@ struct OrbitItemButton: View {
         }
     }
 
+    private var isWindow: Bool {
+        if case .window = item.kind { return true }; return false
+    }
+
+    // Windows render as landscape rectangles (~window aspect); others stay square.
+    private var frameW: CGFloat { isWindow ? 92 : size }
+    private var frameH: CGFloat { isWindow ? 58 : size }
+    private var corner: CGFloat { isWindow ? 8 : 12 }
+
     var body: some View {
         Button(action: action) {
             VStack(spacing: 4) {
                 ZStack(alignment: .bottomTrailing) {
                     Image(nsImage: item.icon)
                         .resizable().interpolation(.high)
-                        .frame(width: size, height: size)
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: frameW, height: frameH)
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
                         .shadow(color: .black.opacity(0.3), radius: 6, y: 3)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            RoundedRectangle(cornerRadius: corner, style: .continuous)
                                 .strokeBorder(Color.white.opacity(isHovered ? 0.4 : 0), lineWidth: 1.5)
                         )
                         .overlay(alignment: .topLeading) {
@@ -350,7 +366,7 @@ struct OrbitItemButton: View {
                     .foregroundStyle(.white)
                     .shadow(color: .black.opacity(0.6), radius: 2)
                     .lineLimit(1)
-                    .frame(maxWidth: size + 12)
+                    .frame(maxWidth: frameW + 12)
             }
         }
         .buttonStyle(.plain)

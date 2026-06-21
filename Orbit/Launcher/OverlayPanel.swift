@@ -81,7 +81,7 @@ final class OverlayPanel: NSPanel {
     // MARK: - Helpers
 
     private func clamped(_ point: CGPoint, in size: CGSize) -> CGPoint {
-        let margin: CGFloat = 175
+        let margin: CGFloat = 185
         return CGPoint(
             x: max(margin, min(size.width  - margin, point.x)),
             y: max(margin, min(size.height - margin, point.y))

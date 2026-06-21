@@ -2,6 +2,75 @@ import Foundation
 import Combine
 import ServiceManagement
 
+// MARK: - System Monitor preference types
+
+enum MonitorMetric: String, Codable, CaseIterable, Identifiable {
+    case cpu, gpu, memory, disk, network, ping, temperature, fan, battery
+    var id: String { rawValue }
+
+    /// English key used with `L()` for the settings list.
+    var labelKey: String {
+        switch self {
+        case .cpu:         return "CPU"
+        case .gpu:         return "GPU"
+        case .ping:        return "Ping"
+        case .memory:      return "Memory"
+        case .disk:        return "Disk"
+        case .network:     return "Network"
+        case .temperature: return "Temperature"
+        case .fan:         return "Fan"
+        case .battery:     return "Battery"
+        }
+    }
+
+    /// Compact label shown in the menu bar strip.
+    var shortLabel: String {
+        switch self {
+        case .cpu:         return "CPU"
+        case .gpu:         return "GPU"
+        case .ping:        return "PING"
+        case .memory:      return "MEM"
+        case .disk:        return "SSD"
+        case .network:     return "NET"
+        case .temperature: return "TEMP"
+        case .fan:         return "FAN"
+        case .battery:     return "BAT"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .cpu:         return "cpu"
+        case .gpu:         return "cpu.fill"
+        case .ping:        return "dot.radiowaves.left.and.right"
+        case .memory:      return "memorychip"
+        case .disk:        return "internaldrive"
+        case .network:     return "arrow.up.arrow.down"
+        case .temperature: return "thermometer.medium"
+        case .fan:         return "fanblades"
+        case .battery:     return "battery.100"
+        }
+    }
+}
+
+enum TemperatureUnit: String, Codable, CaseIterable { case celsius, fahrenheit }
+enum NetworkUnit: String, Codable, CaseIterable { case bytes, bits }
+enum MonitorLabelStyle: String, Codable, CaseIterable { case symbol, name }
+
+/// The 30 most-recognized country flags offered for the menu-bar icon.
+enum MenuBarFlags {
+    static let all: [(flag: String, name: String)] = [
+        ("🇹🇷", "Türkiye"), ("🇺🇸", "United States"), ("🇬🇧", "United Kingdom"),
+        ("🇩🇪", "Germany"), ("🇫🇷", "France"), ("🇮🇹", "Italy"), ("🇪🇸", "Spain"),
+        ("🇵🇹", "Portugal"), ("🇳🇱", "Netherlands"), ("🇷🇺", "Russia"), ("🇨🇳", "China"),
+        ("🇯🇵", "Japan"), ("🇰🇷", "South Korea"), ("🇮🇳", "India"), ("🇧🇷", "Brazil"),
+        ("🇨🇦", "Canada"), ("🇦🇺", "Australia"), ("🇲🇽", "Mexico"), ("🇦🇷", "Argentina"),
+        ("🇸🇦", "Saudi Arabia"), ("🇦🇪", "UAE"), ("🇪🇬", "Egypt"), ("🇿🇦", "South Africa"),
+        ("🇸🇪", "Sweden"), ("🇳🇴", "Norway"), ("🇨🇭", "Switzerland"), ("🇵🇱", "Poland"),
+        ("🇬🇷", "Greece"), ("🇮🇪", "Ireland"), ("🇺🇦", "Ukraine"),
+    ]
+}
+
 /// Single source of truth for all user preferences.
 final class Store: ObservableObject {
     static let shared = Store()
@@ -24,8 +93,60 @@ final class Store: ObservableObject {
         didSet { UserDefaults.standard.set(shakeEnabled, forKey: "shakeEnabled") }
     }
 
+    // MARK: - Window Previews
+
+    @Published var windowPreviews: Bool {
+        didSet { UserDefaults.standard.set(windowPreviews, forKey: "windowPreviews") }
+    }
+
     @Published var shakeSensitivity: Int {
         didSet { UserDefaults.standard.set(shakeSensitivity, forKey: "shakeSensitivity") }
+    }
+
+    // MARK: - System Monitor
+
+    @Published var monitorEnabled: Bool {
+        didSet { UserDefaults.standard.set(monitorEnabled, forKey: "monitorEnabled") }
+    }
+
+    /// Display order of all six metrics (user-reorderable).
+    @Published var metricOrder: [MonitorMetric] {
+        didSet { saveMetricOrder() }
+    }
+
+    /// Metrics the user has hidden. Order is kept in `metricOrder`.
+    @Published var disabledMetrics: Set<MonitorMetric> {
+        didSet { saveDisabledMetrics() }
+    }
+
+    /// Visible metrics, in display order. Used by the status item & popover.
+    var enabledMetrics: [MonitorMetric] {
+        metricOrder.filter { !disabledMetrics.contains($0) }
+    }
+
+    @Published var temperatureUnit: TemperatureUnit {
+        didSet { UserDefaults.standard.set(temperatureUnit.rawValue, forKey: "temperatureUnit") }
+    }
+
+    @Published var networkUnit: NetworkUnit {
+        didSet { UserDefaults.standard.set(networkUnit.rawValue, forKey: "networkUnit") }
+    }
+
+    @Published var monitorInterval: Double {
+        didSet { UserDefaults.standard.set(monitorInterval, forKey: "monitorInterval") }
+    }
+
+    @Published var monitorColorCoding: Bool {
+        didSet { UserDefaults.standard.set(monitorColorCoding, forKey: "monitorColorCoding") }
+    }
+
+    @Published var monitorLabelStyle: MonitorLabelStyle {
+        didSet { UserDefaults.standard.set(monitorLabelStyle.rawValue, forKey: "monitorLabelStyle") }
+    }
+
+    /// Emoji flag for the menu-bar launcher icon; "" = default ◌ symbol.
+    @Published var launcherFlag: String {
+        didSet { UserDefaults.standard.set(launcherFlag, forKey: "launcherFlag") }
     }
 
     // MARK: - Language
@@ -54,8 +175,19 @@ final class Store: ObservableObject {
     private init() {
         shakeEnabled     = UserDefaults.standard.object(forKey: "shakeEnabled")     as? Bool ?? true
         shakeSensitivity = UserDefaults.standard.object(forKey: "shakeSensitivity") as? Int  ?? 5
+        windowPreviews   = UserDefaults.standard.object(forKey: "windowPreviews")   as? Bool ?? false
         rootItems        = Store.loadItems()
         contextSets      = Store.loadContextSets()
+
+        monitorEnabled    = UserDefaults.standard.object(forKey: "monitorEnabled") as? Bool ?? true
+        metricOrder       = Store.loadMetricOrder()
+        disabledMetrics   = Store.loadDisabledMetrics()
+        monitorColorCoding = UserDefaults.standard.object(forKey: "monitorColorCoding") as? Bool ?? true
+        monitorInterval   = UserDefaults.standard.object(forKey: "monitorInterval") as? Double ?? 2
+        monitorLabelStyle = MonitorLabelStyle(rawValue: UserDefaults.standard.string(forKey: "monitorLabelStyle") ?? "") ?? .symbol
+        temperatureUnit   = TemperatureUnit(rawValue: UserDefaults.standard.string(forKey: "temperatureUnit") ?? "") ?? .celsius
+        networkUnit       = NetworkUnit(rawValue: UserDefaults.standard.string(forKey: "networkUnit") ?? "") ?? .bytes
+        launcherFlag      = UserDefaults.standard.string(forKey: "launcherFlag") ?? ""
         if let raw = UserDefaults.standard.string(forKey: "appLanguage"),
            let saved = AppLanguage(rawValue: raw) {
             language = saved
@@ -98,6 +230,31 @@ final class Store: ObservableObject {
         if let data = try? JSONEncoder().encode(rootItems) {
             UserDefaults.standard.set(data, forKey: Store.itemsKey)
         }
+    }
+
+    // MARK: - Monitor Persistence
+
+    private static func loadMetricOrder() -> [MonitorMetric] {
+        guard let raw = UserDefaults.standard.array(forKey: "monitorMetricOrder") as? [String] else {
+            return MonitorMetric.allCases
+        }
+        var order = raw.compactMap { MonitorMetric(rawValue: $0) }
+        // Append any metric missing from a stored order (e.g. after an update).
+        for m in MonitorMetric.allCases where !order.contains(m) { order.append(m) }
+        return order
+    }
+
+    private func saveMetricOrder() {
+        UserDefaults.standard.set(metricOrder.map(\.rawValue), forKey: "monitorMetricOrder")
+    }
+
+    private static func loadDisabledMetrics() -> Set<MonitorMetric> {
+        let raw = UserDefaults.standard.array(forKey: "monitorDisabledMetrics") as? [String] ?? []
+        return Set(raw.compactMap { MonitorMetric(rawValue: $0) })
+    }
+
+    private func saveDisabledMetrics() {
+        UserDefaults.standard.set(disabledMetrics.map(\.rawValue), forKey: "monitorDisabledMetrics")
     }
 
     // MARK: - Context Sets Persistence
