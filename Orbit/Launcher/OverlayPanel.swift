@@ -34,17 +34,21 @@ final class OverlayPanel: NSPanel {
         let screen = NSScreen.main ?? NSScreen.screens[0]
         setFrame(screen.frame, display: false)
 
+        // Use the user-configured scale (set in Settings → General → Radial Menu).
+        let scale = CGFloat(Store.shared.radialScale)
+
         let mouse = NSEvent.mouseLocation
         let swiftUICenter = CGPoint(
             x: mouse.x - screen.frame.minX,
             y: screen.frame.height - (mouse.y - screen.frame.minY)
         )
-        let center = clamped(swiftUICenter, in: screen.frame.size)
+        let center = clamped(swiftUICenter, in: screen.frame.size, scale: scale)
 
         let hosting = NSHostingView(
             rootView: RadialContainerView(
                 rootItems: items,
                 center: center,
+                scale:  scale,
                 keyPublisher:    keySubject.eraseToAnyPublisher(),
                 scrollPublisher: scrollSubject.eraseToAnyPublisher(),
                 onDismiss: { [weak self] in self?.dismiss() }
@@ -80,8 +84,8 @@ final class OverlayPanel: NSPanel {
 
     // MARK: - Helpers
 
-    private func clamped(_ point: CGPoint, in size: CGSize) -> CGPoint {
-        let margin: CGFloat = 185
+    private func clamped(_ point: CGPoint, in size: CGSize, scale: CGFloat = 1) -> CGPoint {
+        let margin: CGFloat = 185 * scale
         return CGPoint(
             x: max(margin, min(size.width  - margin, point.x)),
             y: max(margin, min(size.height - margin, point.y))

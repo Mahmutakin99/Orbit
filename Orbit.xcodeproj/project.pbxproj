@@ -32,6 +32,9 @@
 		D10000010000000000000106 /* Monitor/BatteryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000010000000000000105 /* Monitor/BatteryReader.swift */; };
 		D10000010000000000000108 /* Monitor/SystemControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000010000000000000107 /* Monitor/SystemControls.swift */; };
 		D1000001000000000000010A /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D10000010000000000000109 /* CoreAudio.framework */; };
+		D1000001000000000000010C /* Launcher/RadialPreviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1000001000000000000010B /* Launcher/RadialPreviewController.swift */; };
+		D1000001000000000000010E /* Model/UpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1000001000000000000010D /* Model/UpdateService.swift */; };
+		D10000010000000000000110 /* Model/UpdaterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1000001000000000000010F /* Model/UpdaterViewModel.swift */; };
 		D10000010000000000000104 /* Network.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D10000010000000000000103 /* Network.framework */; };
 /* End PBXBuildFile section */
 
@@ -64,6 +67,9 @@
 		D10000010000000000000107 /* Monitor/SystemControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Monitor/SystemControls.swift; sourceTree = "<group>"; };
 		D10000010000000000000109 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		D10000010000000000000103 /* Network.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Network.framework; path = System/Library/Frameworks/Network.framework; sourceTree = SDKROOT; };
+		D1000001000000000000010B /* Launcher/RadialPreviewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Launcher/RadialPreviewController.swift; sourceTree = "<group>"; };
+		D1000001000000000000010D /* Model/UpdateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model/UpdateService.swift; sourceTree = "<group>"; };
+		D1000001000000000000010F /* Model/UpdaterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model/UpdaterViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +94,7 @@
 				D100000100000000000000B5 /* Info.plist */,
 				D100000100000000000000C1 /* Launcher/OverlayPanel.swift */,
 				D100000100000000000000C3 /* Launcher/RadialMenuView.swift */,
+				D1000001000000000000010B /* Launcher/RadialPreviewController.swift */,
 				D100000100000000000000C5 /* Trigger/HotkeyManager.swift */,
 				D100000100000000000000D1 /* AppItem.swift */,
 				D100000100000000000000D3 /* Apps/AppScanner.swift */,
@@ -99,6 +106,8 @@
 				D100000100000000000000F7 /* Model/UsageTracker.swift */,
 				D100000100000000000000F9 /* Model/ClipboardManager.swift */,
 				D100000100000000000000FB /* Model/Localization.swift */,
+				D1000001000000000000010D /* Model/UpdateService.swift */,
+				D1000001000000000000010F /* Model/UpdaterViewModel.swift */,
 				D100000100000000000000FD /* Monitor/SMC.swift */,
 				D100000100000000000000FF /* Monitor/GPUReader.swift */,
 				D10000010000000000000101 /* Monitor/PingReader.swift */,
@@ -214,6 +223,9 @@
 				D100000100000000000000CA /* Monitor/MonitorStatusController.swift in Sources */,
 				D100000100000000000000CC /* Monitor/MonitorPopoverView.swift in Sources */,
 				D100000100000000000000CE /* Monitor/MonitorViewModel.swift in Sources */,
+				D1000001000000000000010C /* Launcher/RadialPreviewController.swift in Sources */,
+				D1000001000000000000010E /* Model/UpdateService.swift in Sources */,
+				D10000010000000000000110 /* Model/UpdaterViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

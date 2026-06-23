@@ -34,6 +34,7 @@ Orbit lives in your menu bar and gives you two things:
 
 ### Radial Launcher
 - Up to **12 items per page** arranged in a ring around your cursor, with smooth page-flip for more
+- **Adjustable size** — drag the slider in Settings and see the menu resize live in the center of your screen
 - **Folders** — nested radials, one level deep, to group related items
 - **Context sets** — automatically shows a different item set based on whichever app is in front
 - **Clipboard ring** — last 10 copied texts always available inside the radial
@@ -52,6 +53,12 @@ Orbit lives in your menu bar and gives you two things:
 - Configurable refresh interval and metric visibility
 - Popover with detailed stats — click any metric badge to expand
 
+### Auto-Update
+- Orbit checks GitHub Releases once a day in the background
+- A macOS notification appears when a new version is out; tap it to install
+- The update downloads, replaces `/Applications/Orbit.app`, and relaunches — no manual steps
+- Can be turned off or triggered manually in **Settings → General → Updates**
+
 ### Triggers
 | Action | Trigger |
 |--------|---------|
@@ -63,7 +70,7 @@ Orbit lives in your menu bar and gives you two things:
 - **9 languages** — English, Turkish, Spanish, German, French, Chinese, Japanese, Russian, Korean
 - **Custom menu bar icon** — choose any country flag emoji, or keep the default ◌ dot
 - **Launch at login** via SMAppService (no login item hack)
-- No network calls, no telemetry, no subscription
+- No telemetry, no subscription
 
 ---
 
@@ -81,6 +88,8 @@ Orbit lives in your menu bar and gives you two things:
 Go to [Releases](https://github.com/Mahmutakin99/Orbit/releases) and download the latest `Orbit.app.zip`.
 
 Unzip and drag `Orbit.app` to your `/Applications` folder.
+
+> Once installed, Orbit will notify you automatically whenever a new version is released.
 
 ### Option 2 — Build from source
 
@@ -110,7 +119,7 @@ bash install.sh
 |-----|-------------|
 | **Items** | Add, remove, reorder items. Click a folder icon to edit its children. Drag files from Finder. |
 | **Context** | Define per-app item sets that appear automatically when that app is frontmost. |
-| **General** | Keyboard shortcuts, shake trigger, sensitivity, language, launch at login, menu bar icon. |
+| **General** | Radial menu size (with live preview), keyboard shortcuts, shake trigger, language, launch at login, menu bar icon, update settings. |
 | **Monitor** | Enable/disable metrics, set display order, configure units and refresh rate. |
 
 ---
@@ -121,6 +130,7 @@ bash install.sh
 |-----------|-----|
 | Accessibility | Required for global mouse-shake detection |
 | Screen Recording | Optional — enables live window previews in the window switcher |
+| Notifications | Optional — used to alert you when a new update is available |
 
 Orbit requests each permission the first time it needs it and never re-prompts after granting.
 

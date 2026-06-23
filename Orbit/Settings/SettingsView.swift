@@ -769,6 +769,31 @@ private struct GeneralTab: View {
                 }
                 .labelsHidden()
             }
+            Section(L("Radial Menu Size")) {
+                HStack(spacing: 8) {
+                    Image(systemName: "circle.dotted")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                    Slider(
+                        value: $store.radialScale,
+                        in: 0.7...1.6,
+                        onEditingChanged: { editing in
+                            if editing { RadialPreviewController.shared.show() }
+                            else       { RadialPreviewController.shared.hide() }
+                        }
+                    )
+                    Image(systemName: "circle.dotted")
+                        .font(.system(size: 18))
+                        .foregroundStyle(.secondary)
+                }
+                HStack {
+                    Spacer()
+                    Button(L("Reset to default")) { store.radialScale = 1.0 }
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .buttonStyle(.plain)
+                }
+            }
             Section(L("Trigger")) {
                 Toggle(L("Mouse shake (hold ⌥/⌃ + shake)"), isOn: $store.shakeEnabled)
                 if store.shakeEnabled {
@@ -785,6 +810,10 @@ private struct GeneralTab: View {
                     }
                 }
             }
+            Section(L("Updates")) {
+                Toggle(L("Automatically check for updates"), isOn: $store.autoCheckUpdates)
+                UpdateCheckButtonRow()
+            }
             Section(L("Keyboard Shortcut")) {
                 shortcutRow(label: L("Toggle radial menu"), badge: "⌘⇧D")
                 shortcutRow(label: L("Open windows"), badge: "⌘⇧W")
@@ -797,6 +826,25 @@ private struct GeneralTab: View {
             }
         }
         .formStyle(.grouped)
+    }
+}
+
+// MARK: - Update Check Button (used in GeneralTab)
+
+private struct UpdateCheckButtonRow: View {
+    @StateObject private var updater = UpdaterViewModel.shared
+
+    var body: some View {
+        HStack {
+            Button(L("Check for Updates…")) {
+                Task { await updater.check(silent: false) }
+            }
+            .disabled(updater.isChecking)
+            Spacer()
+            if updater.isChecking {
+                ProgressView().controlSize(.small)
+            }
+        }
     }
 }
 

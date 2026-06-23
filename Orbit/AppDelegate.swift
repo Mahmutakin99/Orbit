@@ -20,6 +20,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         _ = Store.shared          // pre-warm UserDefaults read
         UsageTracker.shared.start()
         ClipboardManager.shared.start()
+        scheduleUpdateCheck()
     }
 
     // MARK: - Status Item
@@ -303,6 +304,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             item.previewImage = NSImage(cgImage: cg, size: NSSize(width: pw, height: ph))
         }
         return item
+    }
+
+    // MARK: - Auto Update
+
+    private func scheduleUpdateCheck() {
+        guard Store.shared.autoCheckUpdates else { return }
+        let key = "lastUpdateCheckDate"
+        let last = UserDefaults.standard.object(forKey: key) as? Date ?? .distantPast
+        let dayAgo = Date().addingTimeInterval(-86_400)
+        guard last < dayAgo else { return }
+        UserDefaults.standard.set(Date(), forKey: key)
+
+        // Slight delay so the app fully finishes launch before hitting the network.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+            Task { await UpdaterViewModel.shared.check(silent: true) }
+        }
     }
 
     @objc private func quit() {

@@ -103,6 +103,18 @@ final class Store: ObservableObject {
         didSet { UserDefaults.standard.set(shakeSensitivity, forKey: "shakeSensitivity") }
     }
 
+    // MARK: - Radial Menu Size
+
+    @Published var radialScale: Double {
+        didSet { UserDefaults.standard.set(radialScale, forKey: "radialScale") }
+    }
+
+    // MARK: - Auto Update
+
+    @Published var autoCheckUpdates: Bool {
+        didSet { UserDefaults.standard.set(autoCheckUpdates, forKey: "autoCheckUpdates") }
+    }
+
     // MARK: - System Monitor
 
     @Published var monitorEnabled: Bool {
@@ -173,9 +185,11 @@ final class Store: ObservableObject {
     // MARK: - Init
 
     private init() {
-        shakeEnabled     = UserDefaults.standard.object(forKey: "shakeEnabled")     as? Bool ?? true
-        shakeSensitivity = UserDefaults.standard.object(forKey: "shakeSensitivity") as? Int  ?? 5
-        windowPreviews   = UserDefaults.standard.object(forKey: "windowPreviews")   as? Bool ?? false
+        shakeEnabled       = UserDefaults.standard.object(forKey: "shakeEnabled")       as? Bool   ?? true
+        shakeSensitivity   = UserDefaults.standard.object(forKey: "shakeSensitivity")   as? Int    ?? 5
+        windowPreviews     = UserDefaults.standard.object(forKey: "windowPreviews")     as? Bool   ?? false
+        radialScale        = UserDefaults.standard.object(forKey: "radialScale")        as? Double ?? 1.0
+        autoCheckUpdates   = UserDefaults.standard.object(forKey: "autoCheckUpdates")   as? Bool   ?? true
         rootItems        = Store.loadItems()
         contextSets      = Store.loadContextSets()
 

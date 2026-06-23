@@ -8,6 +8,7 @@ import IOKit.ps
 struct RadialContainerView: View {
     let rootItems:       [OrbitItem]
     let center:          CGPoint
+    var scale:           CGFloat = 1
     let keyPublisher:    AnyPublisher<NSEvent, Never>
     let scrollPublisher: AnyPublisher<CGFloat, Never>
     let onDismiss:       () -> Void
@@ -26,6 +27,7 @@ struct RadialContainerView: View {
         RadialMenuView(
             items:           currentItems,
             center:          center,
+            scale:           scale,
             isNested:        depth > 0,
             keyPublisher:    keyPublisher,
             scrollPublisher: scrollPublisher,
@@ -56,6 +58,7 @@ struct RadialContainerView: View {
 struct RadialMenuView: View {
     let items:           [OrbitItem]
     let center:          CGPoint
+    var scale:           CGFloat = 1
     var isNested:        Bool = false
     let keyPublisher:    AnyPublisher<NSEvent, Never>
     let scrollPublisher: AnyPublisher<CGFloat, Never>
@@ -63,8 +66,8 @@ struct RadialMenuView: View {
     var onBack:          (() -> Void)? = nil
     let onDismiss:       () -> Void
 
-    private var radius:  CGFloat { isWindowMode ? 148 : 130 }
-    private let iconSize: CGFloat = 52
+    private var radius:   CGFloat { (isWindowMode ? 148 : 130) * scale }
+    private var iconSize: CGFloat { 52 * scale }
     private let perPage = OrbitItem.itemsPerPage
 
     /// Windows panel uses a roomier circle for the larger rectangular previews.
@@ -118,7 +121,7 @@ struct RadialMenuView: View {
             Circle()
                 .fill(.ultraThinMaterial.opacity(0.75))
                 .overlay(Circle().strokeBorder(Color.white.opacity(0.1), lineWidth: 1))
-                .frame(width: isWindowMode ? 350 : 310, height: isWindowMode ? 350 : 310)
+                .frame(width: (isWindowMode ? 350 : 310) * scale, height: (isWindowMode ? 350 : 310) * scale)
                 .shadow(color: .black.opacity(0.4), radius: 40, y: 12)
 
             ForEach(Array(pageItems.enumerated()), id: \.element.id) { index, item in
@@ -130,6 +133,7 @@ struct RadialMenuView: View {
                 OrbitItemButton(
                     item:      item,
                     size:      iconSize,
+                    scale:     scale,
                     isHovered: hoveredID == item.id,
                     intensity: intensity > 0 ? intensity : nil,
                     badge:     keyBadge(for: index)
@@ -144,6 +148,7 @@ struct RadialMenuView: View {
                 centerContent
                 if totalPages > 1 { pageDots }
             }
+            .scaleEffect(scale)
         }
     }
 
@@ -297,6 +302,7 @@ private struct BatteryState {
 struct OrbitItemButton: View {
     let item:      OrbitItem
     let size:      CGFloat
+    var scale:     CGFloat = 1
     let isHovered: Bool
     var intensity: Double? = nil   // 0…1; nil = no dot
     var badge:     String? = nil
@@ -316,9 +322,9 @@ struct OrbitItemButton: View {
     }
 
     // Windows render as landscape rectangles (~window aspect); others stay square.
-    private var frameW: CGFloat { isWindow ? 92 : size }
-    private var frameH: CGFloat { isWindow ? 58 : size }
-    private var corner: CGFloat { isWindow ? 8 : 12 }
+    private var frameW: CGFloat { isWindow ? 92 * scale : size }
+    private var frameH: CGFloat { isWindow ? 58 * scale : size }
+    private var corner: CGFloat { (isWindow ? 8 : 12) * scale }
 
     var body: some View {
         Button(action: action) {
@@ -339,7 +345,7 @@ struct OrbitItemButton: View {
                             if let color = dotColor {
                                 Circle()
                                     .fill(color)
-                                    .frame(width: 7, height: 7)
+                                    .frame(width: 7 * scale, height: 7 * scale)
                                     .shadow(color: color, radius: 3)
                                     .offset(x: -2, y: -2)
                             }
@@ -347,14 +353,14 @@ struct OrbitItemButton: View {
 
                     if item.isSubmenu {
                         Image(systemName: "chevron.forward.circle.fill")
-                            .font(.system(size: 14))
+                            .font(.system(size: 14 * scale))
                             .foregroundStyle(.white, Color.accentColor)
                             .offset(x: 4, y: 4)
                     } else if let b = badge, !isHovered {
                         Text(b)
-                            .font(.system(size: 8, weight: .bold))
+                            .font(.system(size: 8 * scale, weight: .bold))
                             .foregroundStyle(.white)
-                            .frame(width: 14, height: 14)
+                            .frame(width: 14 * scale, height: 14 * scale)
                             .background(.black.opacity(0.55))
                             .clipShape(Circle())
                             .offset(x: 4, y: 4)
@@ -362,11 +368,11 @@ struct OrbitItemButton: View {
                 }
 
                 Text(item.title)
-                    .font(.system(size: 9, weight: .semibold))
+                    .font(.system(size: 9 * scale, weight: .semibold))
                     .foregroundStyle(.white)
                     .shadow(color: .black.opacity(0.6), radius: 2)
                     .lineLimit(1)
-                    .frame(maxWidth: frameW + 12)
+                    .frame(maxWidth: (frameW + 12))
             }
         }
         .buttonStyle(.plain)

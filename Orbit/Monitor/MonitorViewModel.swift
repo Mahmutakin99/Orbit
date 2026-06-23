@@ -77,13 +77,17 @@ final class MonitorViewModel: ObservableObject {
         cores = monitor.perCoreUsage
         topProcesses = monitor.topProcesses
 
+        // Cards show ALL metrics (even those hidden from the menu bar strip)
+        // so the popover always has the full picture.
         var newCards: [MetricCardVM] = []
+        for metric in store.metricOrder { newCards.append(makeCard(metric)) }
+        cards = newCards
+
+        // Strip only shows the metrics the user hasn't disabled.
         var segs: [StripSegment] = []
         for metric in store.enabledMetrics {
-            newCards.append(makeCard(metric))
             if let seg = stripSegment(metric) { segs.append(seg) }
         }
-        cards = newCards
         stripSegments = segs
     }
 

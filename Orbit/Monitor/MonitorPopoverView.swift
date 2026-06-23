@@ -8,8 +8,9 @@ struct MonitorPopoverView: View {
     @ObservedObject private var controls = SystemControls.shared
     let onOpenSettings: () -> Void
 
-    private let columns = [GridItem(.flexible(), spacing: 8),
-                           GridItem(.flexible(), spacing: 8)]
+    private let columns = [GridItem(.flexible(), spacing: 6),
+                           GridItem(.flexible(), spacing: 6),
+                           GridItem(.flexible(), spacing: 6)]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -74,8 +75,8 @@ struct MonitorPopoverView: View {
             .buttonStyle(.plain)
             .foregroundStyle(Color.accentColor)
         }
-        .padding(14)
-        .frame(width: 300)
+        .padding(12)
+        .frame(width: 330)
     }
 
     @ViewBuilder
@@ -110,39 +111,47 @@ private struct ControlSliderRow: View {
 private struct CardView: View {
     let card: MetricCardVM
 
+    // Compact primary value: for bar metrics (mem/disk) show the % instead of bytes
+    private var displayValue: String {
+        if card.barFraction != nil, let s = card.secondary { return s }
+        return card.bigValue
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            HStack(spacing: 5) {
-                Image(systemName: card.icon).font(.caption).foregroundStyle(card.supported ? card.tint : .secondary)
-                Text(card.title).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 4) {
+                Image(systemName: card.icon)
+                    .font(.system(size: 9))
+                    .foregroundStyle(card.supported ? card.tint : .secondary)
+                Text(card.metric.shortLabel)
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
 
             if !card.supported {
-                Text(card.note).font(.caption2).foregroundStyle(.tertiary).lineLimit(2)
+                Text("—").font(.system(.callout, design: .rounded).weight(.semibold))
+                    .foregroundStyle(.tertiary)
             } else {
-                Text(card.bigValue)
-                    .font(.system(.title3, design: .rounded).weight(.semibold))
+                Text(displayValue)
+                    .font(.system(.callout, design: .rounded).weight(.semibold))
                     .foregroundStyle(card.color)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.6)
 
                 if let history = card.history {
-                    Sparkline(values: history, color: card.tint).frame(height: 14)
+                    Sparkline(values: history, color: card.tint).frame(height: 10)
                 } else if let bar = card.barFraction {
-                    HStack(spacing: 6) {
-                        MiniBar(value: bar, tint: card.tint).frame(height: 5)
-                        if let s = card.secondary {
-                            Text(s).font(.caption2).foregroundStyle(.secondary)
-                        }
-                    }
-                } else if let s = card.secondary {
-                    Text(s).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                    MiniBar(value: bar, tint: card.tint).frame(height: 4)
+                } else if let s = card.secondary, card.metric != .battery {
+                    // Network shows ↓down; battery secondary (health/cycles) is too long
+                    Text(s).font(.system(size: 9)).foregroundStyle(.secondary).lineLimit(1)
                 }
             }
         }
-        .padding(9)
-        .frame(maxWidth: .infinity, minHeight: 66, alignment: .topLeading)
-        .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(.regularMaterial))
+        .padding(7)
+        .frame(maxWidth: .infinity, minHeight: 56, alignment: .topLeading)
+        .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(.regularMaterial))
     }
 }
 
